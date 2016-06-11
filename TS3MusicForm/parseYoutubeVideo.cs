@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 
-namespace TS3MusicForm
+namespace TS3MusicBot
 {
     // Thanks to github.com/JackChappell for this class :)
 
