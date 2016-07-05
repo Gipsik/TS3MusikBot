@@ -1,4 +1,4 @@
-#TS3MusicBot
+#TS3MusikBot
 ##Teamspeak3 Music Bot capable of getting requested songs and playing them through a teamspeak music user.
 
 ###Documentation / Setup instructions
