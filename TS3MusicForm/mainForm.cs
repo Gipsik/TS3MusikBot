@@ -6,6 +6,9 @@ using TS3QueryLib.Core.Server;
 using VideoLibrary;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Speech.Synthesis;
 
 namespace TS3MusicBot
 {
@@ -19,6 +22,7 @@ namespace TS3MusicBot
 
         public AsyncTcpDispatcher QueryDispatcher; // Query object
         public QueryRunner QR; // used to run all the queries on the server
+        public Process autoDJ;
 
         public uint channelID; // used for storing musicbot client side ID
         public uint clientID; // get's client ID's for commands
@@ -32,6 +36,7 @@ namespace TS3MusicBot
 
         public int retrySong;
         public bool repeatSong = false;
+        public bool autoplay = false;
 
         public string currentSongTitle = "Nothing playing!"; // will be used to store song titles
         public string currentSongURL = "Well, nothings playing.. So.. Nothing?"; // will be used to store song URL's
@@ -140,6 +145,7 @@ namespace TS3MusicBot
                 var whoami = QR.SendWhoAmI(); // asks the server who it is, and stores all that in the whoami variable
                 QR.MoveClient(whoami.ClientId, channelID); // moves the serverquery to the channel where the music bot is
                 var registeredForNotifications = QR.RegisterForNotifications(TS3QueryLib.Core.Server.Entities.ServerNotifyRegisterEvent.TextChannel); // registers for notifications
+                var checkChannel = QR.RegisterForNotifications(TS3QueryLib.Core.Server.Entities.ServerNotifyRegisterEvent.TextServer); // check channel notifications
                 if (registeredForNotifications.IsErroneous) { Console.WriteLine(registeredForNotifications.ErrorMessage); } // if it fails to register (for some reason)
                 else
                 {
@@ -159,6 +165,7 @@ namespace TS3MusicBot
             string user = e.InvokerNickname; // gets the user who initated the request
             string message = e.Message; // gets the user's request
             uint clientid = e.InvokerClientId; // gets their client ID
+            Console.WriteLine(user, message);
             generateCommands(user, clientid, message); // passes info to method to sort out!
         }
         public void initiatePlayer()
@@ -181,52 +188,101 @@ namespace TS3MusicBot
                     {
                         repeat(); // disable repeat!
                     }
+                    if (autoplay)
+                    {
+                        stopAuto();
+                    }
                     getNextSong();
 
                 } // if the users skipping a song
-                else if (getCommand.Contains("!song")) { currentSong(); } // if the users asking for the song
-                else if (getCommand.Contains("!help")) // if the user needs help
+                else if (getCommand.ToLower().Contains("!song")) { currentSong(); } // if the users asking for the song
+                else if (getCommand.ToLower().Contains("!help")) // if the user needs help
                 {
                     var userID = clientID;
                     QR.PokeClient(userID, "How to use Jack's Music Bot!");
                     QR.PokeClient(userID, "'!play [song youtube url]' to request a song!");
                     QR.PokeClient(userID, "'!skip' to skip the current song!");
                     QR.PokeClient(userID, "'!song' to get the current song that's playing!");
+                    QR.PokeClient(userID, "'!auto' to auto play music (NIGHTCORE!)");
                     QR.PokeClient(userID, "'!repeat' to toggle repeat for the current song that's playing!");
+                    QR.PokeClient(userID, "!gold to get the current price of 1 WoW token");
+                    QR.PokeClient(userID, "'!say [text here]' to make the bot speak!");
                 }
-                else if (getCommand.Contains("!repeat"))
+                else if (getCommand.ToLower().Contains("!repeat"))
                 {
                     repeat();
                 }
-                else if (getCommand.Contains("!clear"))
+                else if (getCommand.ToLower().Contains("!clear"))
                 {
                     clearLists();
+                }
+                else if (getCommand.ToLower().Contains("!auto"))
+                {
+                    Auto();
+                }
+                else if (getCommand.ToLower().Contains("!gold"))
+                {
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Current price for 1 WoW token: " + getWoWGold());
+                }
+                else if(getCommand.ToLower().Contains("!say"))
+                {
+                    string speech = getCommand.ToLower();
+                    speech = speech.Replace("!say", "");
+                    textToSpeech(speech);
                 }
             }
             catch (Exception) { Console.WriteLine("Error with code"); }
         }
+
+        public void Auto()
+        {
+            if (autoplay)
+            {
+                stopAuto();
+                return;
+            }
+            restartPlayer();
+            autoplay = true;
+            using (WebClient WC = new WebClient())
+            {
+                WC.DownloadFile("http://stream.nightcoreradio.com:9040/main_stream.m3u", "playlist.m3u");
+            }
+            autoDJ = Process.Start("playlist.m3u");
+            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Nightcore is autoplaying!");
+        }
+
+        public void stopAuto()
+        {
+            autoplay = false;
+            Process[] MP = Process.GetProcessesByName("wmplayer");
+            MP[0].Kill();
+            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Nightcore has stopped!");
+        }
+
         public void addToQueue(string user, string getCommand)
         {
+            if (autoplay)
+            {
+                stopAuto();
+            }
+
             string vidURL = getCommand.Replace("!play ", ""); // replaces to make a user friendly string
             try
             {
-                if(vidURL.Contains("?t="))
+                if (vidURL.Contains("?t="))
                 {
                     vidURL = vidURL.Remove(vidURL.LastIndexOf('?'), vidURL.Length - vidURL.LastIndexOf('?'));
                 }
-                else if(vidURL.Contains("#t="))
+                else if (vidURL.Contains("#t="))
                 {
                     vidURL = vidURL.Remove(vidURL.LastIndexOf('#'), vidURL.Length - vidURL.LastIndexOf('#'));
                 }
                 var youtube = YouTube.Default; // creates youtube object for getting video ect
                 var video = youtube.GetVideo(vidURL); // gets the video info
-                foreach (var fd in songLoc)
+                if (songLoc.Contains(vidURL)) // if song is already in the playlist (to prevent spamming :P)
                 {
-                    if (fd == vidURL) // if song is already in the playlist (to prevent spamming :P)
-                    {
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Song is already in the queue!"); // tell them songs already there
-                        return;
-                    }
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Song is already in the queue!"); // tell them songs already there
+                    return;
                 }
                 if (user != null)
                     QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, user + " has requested: " + video.Title); // tells the channel who requested what
@@ -253,7 +309,7 @@ namespace TS3MusicBot
                 }
                 retrySong = 0; */
                 QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Sorry, " + user + " but your request cannot be fulfilled! :(");
-                string logReportString = user + " - " + getCommand + " - " + System.DateTime.Now.ToString("h:mm:ss tt") + ":" + System.DateTime.Now.Date.ToString();
+                string logReportString = user + " - " + getCommand + " - " + System.DateTime.Now.ToString("h:mm:ss tt") + ":" + System.DateTime.Now.Date.ToString() + Environment.NewLine;
                 File.AppendAllText("log.txt", logReportString);
                 return;
 
@@ -344,7 +400,7 @@ namespace TS3MusicBot
 
         private void encounteredError(object sender, EventArgs e)
         {
-            string logReportString = e.ToString() + " - " + System.DateTime.Now.ToString("h:mm:ss tt") + ":" + System.DateTime.Now.Date.ToString();
+            string logReportString = e.ToString() + " - " + System.DateTime.Now.ToString("h:mm:ss tt") + ":" + System.DateTime.Now.Date.ToString() + Environment.NewLine;
             File.AppendAllText("log.txt", logReportString);
             getNextSong();
         } // song has ended or VLC as errored, get the next song
@@ -374,5 +430,40 @@ namespace TS3MusicBot
             songLoc.Clear(); // clear song locations
             QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Song list cleared!"); // tell users the list cleared! :P
         }
+
+        private string getWoWGold() // per request, it now gets the current wow gold price.
+        {
+            try
+            {
+                using (WebClient WC = new WebClient()) // new webclient because i'm lazy and can't be bothered using httprequests ect
+                {
+                    string gold = WC.DownloadString("https://wowtoken.info/"); // download the page
+                    gold = gold.Substring(gold.IndexOf("EU-buy"), 100); // shrink the string to 100 characters
+                    gold = gold.Substring(gold.IndexOf('>') + 1, gold.IndexOf('<') - gold.IndexOf('>') - 1); // get the innerHTML with my super awkward code
+                    return gold; // return the string
+                }
+            }
+            catch (Exception)
+            {
+                return "N/A";
+            }
+        }
+
+        private void textToSpeech(string say) // added text to speech, in case it's ever needed. Also useful for songs
+        {
+            using (SpeechSynthesizer synth = new SpeechSynthesizer()) // easy disposable objects, to limit resource consumption
+            {
+                synth.SetOutputToDefaultAudioDevice(); // set output to default audio output
+                if (say.Length >= 50)
+                {
+                    synth.Speak("Please keep the speak under 50 characters. Kappa."); // say whatever wants to be said.
+                    return;
+                }
+                synth.Speak(say); // say whatever wants to be said.
+            }
+            
+            
+        }
+
     }
 }
