@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(mainForm));
             this.axVLCPlugin21 = new AxAXVLC.AxVLCPlugin2();
             this.checkChannel = new System.Windows.Forms.Timer(this.components);
+            this.checkForUpdates = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.axVLCPlugin21)).BeginInit();
             this.SuspendLayout();
             // 
@@ -41,7 +42,7 @@
             this.axVLCPlugin21.Location = new System.Drawing.Point(13, 12);
             this.axVLCPlugin21.Name = "axVLCPlugin21";
             this.axVLCPlugin21.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axVLCPlugin21.OcxState")));
-            this.axVLCPlugin21.Size = new System.Drawing.Size(320, 148);
+            this.axVLCPlugin21.Size = new System.Drawing.Size(320, 149);
             this.axVLCPlugin21.TabIndex = 0;
             this.axVLCPlugin21.TabStop = false;
             this.axVLCPlugin21.Visible = false;
@@ -53,7 +54,13 @@
             this.checkChannel.Interval = 6000;
             this.checkChannel.Tick += new System.EventHandler(this.checkChannel_Tick);
             // 
-            // Form1
+            // checkForUpdates
+            // 
+            this.checkForUpdates.Enabled = true;
+            this.checkForUpdates.Interval = 5000;
+            this.checkForUpdates.Tick += new System.EventHandler(this.checkForUpdates_Tick);
+            // 
+            // mainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -66,7 +73,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Form1";
+            this.Name = "mainForm";
             this.Opacity = 0D;
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
@@ -82,6 +89,7 @@
 
         private AxAXVLC.AxVLCPlugin2 axVLCPlugin21;
         private System.Windows.Forms.Timer checkChannel;
+        private System.Windows.Forms.Timer checkForUpdates;
     }
 }
 

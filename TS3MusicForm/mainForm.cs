@@ -474,5 +474,30 @@ namespace TS3MusicBot
             
         }
 
+        private void checkForUpdates_Tick(object sender, EventArgs e)
+        {
+            using (WebClient wc = new WebClient())
+            {
+
+                string s = wc.DownloadString("https://github.com/JackRyder/TS3MusikBot/commit/master");
+                int indexOf = s.IndexOf("<span class=\"sha user-select-contain\">");
+                s = s.Substring(indexOf, 200);
+                if (!File.Exists(@"latest.txt"))
+                {
+                    File.WriteAllText("latest.txt", s);
+                }
+                else
+                {
+                    if(File.ReadAllText("latest.txt") != s)
+                    {
+                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Updating Jack's music bot to new version.");
+                        stopAuto();
+                        Process.Start("TS3MusikUpdater.exe");
+                    }
+                }
+            }
+
+                
+        }
     }
 }
