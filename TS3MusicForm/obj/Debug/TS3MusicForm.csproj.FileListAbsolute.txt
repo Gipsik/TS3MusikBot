@@ -1,0 +1,32 @@
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\bin\Debug\TS3MusicForm.exe.config
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\bin\Debug\TS3MusicForm.exe
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\bin\Debug\TS3MusicForm.pdb
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\bin\Debug\libvideo.dll
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\bin\Debug\TS3QueryLib.Core.Framework.dll
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\bin\Debug\Interop.AXVLC.dll
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\bin\Debug\AxInterop.AXVLC.dll
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\obj\Debug\TS3MusicForm.csprojResolveAssemblyReference.cache
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\obj\Debug\Interop.AXVLC.dll
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\obj\Debug\AxInterop.AXVLC.dll
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\obj\Debug\TS3MusicForm.csproj.ResolveComReference.cache
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\obj\Debug\TS3MusicForm.Form1.resources
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\obj\Debug\TS3MusicForm.Properties.Resources.resources
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\obj\Debug\TS3MusicForm.csproj.GenerateResource.Cache
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\obj\Debug\TS3MusicForm.exe
+E:\Dropbox\My C# Projects\TS3MusicForm - Copy\TS3MusicForm\obj\Debug\TS3MusicForm.pdb
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\bin\Debug\TS3MusicForm.exe.config
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\bin\Debug\TS3MusicForm.exe
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\bin\Debug\TS3MusicForm.pdb
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\bin\Debug\libvideo.dll
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\bin\Debug\TS3QueryLib.Core.Framework.dll
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\bin\Debug\Interop.AXVLC.dll
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\bin\Debug\AxInterop.AXVLC.dll
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\obj\Debug\Interop.AXVLC.dll
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\obj\Debug\AxInterop.AXVLC.dll
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\obj\Debug\TS3MusicForm.csproj.ResolveComReference.cache
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\obj\Debug\TS3MusicForm.Form1.resources
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\obj\Debug\TS3MusicForm.Properties.Resources.resources
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\obj\Debug\TS3MusicForm.csproj.GenerateResource.Cache
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\obj\Debug\TS3MusicForm.exe
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\obj\Debug\TS3MusicForm.pdb
+E:\Dropbox\My C# Projects\TS3MusicForm\TS3MusicForm\obj\Debug\TS3MusicForm.csprojResolveAssemblyReference.cache
