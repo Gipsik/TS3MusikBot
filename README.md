@@ -9,6 +9,7 @@ Here's a simple way of getting the bot setup. To make it work you want to have a
 
 * .NET Framework 4.6.1 or above (This requires Windows 7 SP1 or above)
 * A virtual audio device, (I recommend CABLE Virtual Audio).
+* VLC Media Player
 * Teamspeak3, and access to a mod/admin serverquery account
 * DirectX, may be required also.
 
