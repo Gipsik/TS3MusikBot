@@ -19,10 +19,10 @@ namespace TS3MusikUpdater
             string directory = imLocatedAt + @"\" + randomFolderName + @"\TS3MusikBot-master\TS3MusicForm\bin\Debug\";
             
 
-            Process[] P = Process.GetProcessesByName("TS3MusicForm");
-            if(P.Count() != 0)
+            Process[] processes = Process.GetProcessesByName("TS3 Music Bot");
+            foreach(Process process in processes)
             {
-                P.First().Kill();
+                process.Kill();
             }
 
             try
