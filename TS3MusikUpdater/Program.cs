@@ -25,44 +25,44 @@ namespace TS3MusikUpdater
                 process.Kill();
             }
 
-            //   try
-            //   {
-            using (WebClient WC = new WebClient())
+            try
             {
-                WC.DownloadFile("https://github.com/JackRyder/TS3MusikBot/archive/master.zip", imLocatedAt + @"\new.zip");
-            }
-
-            ZipFile.ExtractToDirectory(imLocatedAt + @"\new.zip", imLocatedAt + @"\" + randomFolderName);
-            File.Delete(imLocatedAt + @"\new.zip");
-            foreach (string fileName in Directory.GetFiles(directory))
-            {
-                int lastSlash = fileName.LastIndexOf('\\');
-                string safeFileName = fileName.Remove(0, lastSlash + 1);
-
-                if (safeFileName.Contains("TS3MusikUpdater.exe"))
+                using (WebClient WC = new WebClient())
                 {
-                    continue;
+                    WC.DownloadFile("https://github.com/JackRyder/TS3MusikBot/archive/master.zip", imLocatedAt + @"\new.zip");
                 }
 
-                if (File.Exists(imLocatedAt + @"\" + safeFileName))
+                ZipFile.ExtractToDirectory(imLocatedAt + @"\new.zip", imLocatedAt + @"\" + randomFolderName);
+                File.Delete(imLocatedAt + @"\new.zip");
+                foreach (string fileName in Directory.GetFiles(directory))
                 {
-                    File.Delete(imLocatedAt + @"\" + safeFileName);
-                }
+                    int lastSlash = fileName.LastIndexOf('\\');
+                    string safeFileName = fileName.Remove(0, lastSlash + 1);
 
-                File.Move(fileName, imLocatedAt + @"\" + safeFileName);
+                    if (safeFileName.Contains("TS3MusikUpdater.exe"))
+                    {
+                        continue;
+                    }
+
+                    if (File.Exists(imLocatedAt + @"\" + safeFileName))
+                    {
+                        File.Delete(imLocatedAt + @"\" + safeFileName);
+                    }
+
+                    File.Move(fileName, imLocatedAt + @"\" + safeFileName);
+                }
+                System.Threading.Thread.Sleep(4000);
+                Directory.Delete(imLocatedAt + @"\" + randomFolderName, true);
             }
-            System.Threading.Thread.Sleep(4000);
-            Directory.Delete(imLocatedAt + @"\" + randomFolderName, true);
-            //}
-            // }
-            // catch (Exception)
-            // {
-            //    Directory.Delete(imLocatedAt + @"\" + randomFolderName, true);
-            // }
-            //finally
-            // {
-            //      Process.Start("TS3 Music Bot.exe");
-            //}
+            catch (Exception)
+            {
+                System.Threading.Thread.Sleep(4000);
+                Directory.Delete(imLocatedAt + @"\" + randomFolderName, true);
+            }
+            finally
+            {
+                Process.Start("TS3 Music Bot.exe");
+            }
 
 
         }
