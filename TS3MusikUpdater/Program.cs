@@ -17,47 +17,54 @@ namespace TS3MusikUpdater
             string imLocatedAt = Environment.CurrentDirectory;
             string randomFolderName = new Random().Next(1, 9999).ToString();
             string directory = imLocatedAt + @"\" + randomFolderName + @"\TS3MusikBot-master\TS3MusicForm\bin\Debug\";
-            
+
 
             Process[] processes = Process.GetProcessesByName("TS3 Music Bot");
-            foreach(Process process in processes)
+            foreach (Process process in processes)
             {
                 process.Kill();
             }
 
-            try
+            //   try
+            //   {
+            using (WebClient WC = new WebClient())
             {
-                using (WebClient WC = new WebClient())
+                WC.DownloadFile("https://github.com/JackRyder/TS3MusikBot/archive/master.zip", imLocatedAt + @"\new.zip");
+            }
+
+            ZipFile.ExtractToDirectory(imLocatedAt + @"\new.zip", imLocatedAt + @"\" + randomFolderName);
+            File.Delete(imLocatedAt + @"\new.zip");
+            foreach (string fileName in Directory.GetFiles(directory))
+            {
+                int lastSlash = fileName.LastIndexOf('\\');
+                string safeFileName = fileName.Remove(0, lastSlash + 1);
+
+                if (safeFileName.Contains("TS3MusikUpdater.exe"))
                 {
-                    WC.DownloadFile("https://github.com/JackRyder/TS3MusikBot/archive/master.zip", imLocatedAt + @"\new.zip");
+                    continue;
                 }
 
-                ZipFile.ExtractToDirectory(imLocatedAt + @"\new.zip", imLocatedAt + @"\" + randomFolderName);
-                File.Delete(imLocatedAt + @"\new.zip");
-                foreach (string fileName in Directory.GetFiles(directory))
+                if (File.Exists(imLocatedAt + @"\" + safeFileName))
                 {
-                    int lastSlash = fileName.LastIndexOf('\\');
-                    string safeFileName = fileName.Remove(0, lastSlash + 1);
-
-                    if (File.Exists(imLocatedAt + @"\" + safeFileName))
-                    {
-                        File.Delete(imLocatedAt + @"\" + safeFileName);
-                    }
-
-                    File.Move(fileName, imLocatedAt + @"\" + safeFileName);
+                    File.Delete(imLocatedAt + @"\" + safeFileName);
                 }
-                Directory.Delete(imLocatedAt + @"\" + randomFolderName,true);
+
+                File.Move(fileName, imLocatedAt + @"\" + safeFileName);
             }
-            catch (Exception)
-            {
-                Directory.Delete(imLocatedAt + @"\" + randomFolderName, true);
-            }
-            finally
-            {
-                Process.Start("TS3 Music Bot.exe");
-            }
-            
-            
+            System.Threading.Thread.Sleep(4000);
+            Directory.Delete(imLocatedAt + @"\" + randomFolderName, true);
+            //}
+            // }
+            // catch (Exception)
+            // {
+            //    Directory.Delete(imLocatedAt + @"\" + randomFolderName, true);
+            // }
+            //finally
+            // {
+            //      Process.Start("TS3 Music Bot.exe");
+            //}
+
+
         }
     }
 }
