@@ -131,7 +131,23 @@ namespace TS3MusicBot
             var getMusicBotID = QR.GetClientIdsByUniqueId(uniqueID); // gets the client side music bot by the ID
             if (getMusicBotID.ResponseText.Contains("1281")) // if the music bot isnt there
             {
-                Process.Start(@"C:\Program Files (x86)\TeamSpeak 3 Client\ts3client_win32.exe"); // start music bot
+                string path = "";
+                if(File.Exists(@"C:\Program Files(x86)\TeamSpeak 3 Client\ts3client_win32.exe"))
+                {
+                    path = @"C:\Program Files(x86)\TeamSpeak 3 Client\ts3client_win32.exe";
+                }
+                else if(File.Exists(@"C:\Program Files\TeamSpeak 3 Client\ts3client_win32.exe"))
+                {
+                    path = @"C:\Program Files\TeamSpeak 3 Client\ts3client_win32.exe";
+                }
+                else
+                {
+                    Console.WriteLine("Cannot find TS3Client location");
+                    Console.ReadLine();
+                    Application.Exit();
+                    return;
+                }
+                Process.Start(path); // start music bot
                 System.Threading.Thread.Sleep(6000); // sleep for 6 seconds, giving it time to boot up and auto join
                 initiateCommands(); // recheck for the bot location
             }
