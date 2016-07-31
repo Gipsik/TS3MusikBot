@@ -506,6 +506,7 @@ namespace TS3MusicBot
                 {
                     if(File.ReadAllText("latest.txt") != s)
                     {
+                        File.Delete("latest.txt");
                         QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Updating Jack's music bot to new version.");
                         if(autoplay)
                         {
