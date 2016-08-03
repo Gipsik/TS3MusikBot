@@ -35,3 +35,4 @@ E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\obj\Debug\TS3MusicBot.Propert
 E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\obj\Debug\TS3 Music Bot.csproj.GenerateResource.Cache
 E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\obj\Debug\TS3 Music Bot.exe
 E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\obj\Debug\TS3 Music Bot.pdb
+E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\obj\Debug\TS3 Music Bot.csprojResolveAssemblyReference.cache

@@ -265,8 +265,9 @@ namespace TS3MusicBot
                         }
                         QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Playlist added, to remove do !clear");
                     }
-                    catch(Exception)
+                    catch(Exception e)
                     {
+                        File.AppendAllText("log.txt", e.Message);
                         QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Bad Request. Tell Jack about this and he'll fix it");
                     }
                     
