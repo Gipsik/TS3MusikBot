@@ -203,7 +203,7 @@ namespace TS3MusicBot
         {
             try
             {
-                if (getCommand.Contains("!play")) { addToQueue(user, getCommand); } // if the users playing a song
+                if (getCommand.Contains("!play") && !getCommand.Contains("!playlist")) { addToQueue(user, getCommand); } // if the users playing a song
                 else if (getCommand.Contains("!skip"))
                 {
                     if (repeatSong) // if repeat is enabled
