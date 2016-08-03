@@ -203,7 +203,7 @@ namespace TS3MusicBot
         {
             try
             {
-                if(QR.GetClientInfo(clientID).UniqueId == uniqueID)
+                if(user.Contains("MusicBot")) // temp!
                 {
                     return;
                 }
