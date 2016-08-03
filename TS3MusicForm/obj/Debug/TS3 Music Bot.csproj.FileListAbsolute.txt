@@ -36,3 +36,6 @@ E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\obj\Debug\TS3 Music Bot.cspro
 E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\obj\Debug\TS3 Music Bot.exe
 E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\obj\Debug\TS3 Music Bot.pdb
 E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\obj\Debug\TS3 Music Bot.csprojResolveAssemblyReference.cache
+E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\bin\Debug\Google.Apis.Core.dll
+E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\bin\Debug\Google.Apis.Core.pdb
+E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusicForm\bin\Debug\Google.Apis.Core.xml
