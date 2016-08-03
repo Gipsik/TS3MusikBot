@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Speech.Synthesis;
+using YoutubePlaylists;
 
 namespace TS3MusicBot
 {
@@ -22,6 +23,7 @@ namespace TS3MusicBot
         public AsyncTcpDispatcher QueryDispatcher; // Query object
         public QueryRunner QR; // used to run all the queries on the server
         public Process autoDJ;
+        public playlist playlistRequest;
 
         public uint channelID; // used for storing musicbot client side ID
         public uint clientID; // get's client ID's for commands
@@ -59,10 +61,11 @@ namespace TS3MusicBot
                 username = config[2];
                 password = config[3];
                 uniqueID = config[4];
+                playlistRequest = new playlist(config[5]);
             }
             else
             {
-                string[] config = new string[5];
+                string[] config = new string[6];
 
                 Console.WriteLine("Cannot find your config.ini, please enter your credentials and they will be saved for next time");
                 Console.WriteLine("Server IP: ");
@@ -75,6 +78,8 @@ namespace TS3MusicBot
                 config[3] = Console.ReadLine();
                 Console.WriteLine("Musicbot unique ID (google to find out how to get this!)");
                 config[4] = Console.ReadLine();
+                Console.WriteLine("Your google API key: leave empty if you don't have one.");
+                config[5] = Console.ReadLine();
 
                 File.WriteAllLines("config.ini", config);
                 Console.Clear();
@@ -247,6 +252,24 @@ namespace TS3MusicBot
                     string speech = getCommand.ToLower();
                     speech = speech.Replace("!say", "");
                     textToSpeech(speech);
+                }
+                else if(getCommand.ToLower().Contains("!playlist"))
+                {
+                    try
+                    {
+                        string playlistID = getCommand.ToLower().Replace("!playlist", "");
+                        string[] IDs = playlistRequest.getVideos(playlistID);
+                        foreach(string ID in IDs)
+                        {
+                            addToQueue(null, "http://youtube.com/watch?v=" + ID);
+                        }
+                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Playlist added, to remove do !clear");
+                    }
+                    catch(Exception)
+                    {
+                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Bad Request. Tell Jack about this and he'll fix it");
+                    }
+                    
                 }
             }
             catch (Exception) { Console.WriteLine("Error with code"); }
