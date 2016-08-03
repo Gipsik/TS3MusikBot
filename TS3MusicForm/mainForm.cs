@@ -203,6 +203,12 @@ namespace TS3MusicBot
         {
             try
             {
+                if(QR.GetClientInfo(clientID).UniqueId == uniqueID)
+                {
+                    return;
+                }
+
+
                 if (getCommand.Contains("!play") && !getCommand.Contains("!playlist")) { addToQueue(user, getCommand); } // if the users playing a song
                 else if (getCommand.Contains("!skip"))
                 {
