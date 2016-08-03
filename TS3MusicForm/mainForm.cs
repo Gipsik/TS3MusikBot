@@ -257,7 +257,8 @@ namespace TS3MusicBot
                 {
                     try
                     {
-                        string playlistID = getCommand.ToLower().Replace("!playlist", "");
+                        string playlistID = getCommand.ToLower().Replace("!playlist", "").Trim();
+                        File.AppendAllText("log.txt", playlistID);
                         string[] IDs = playlistRequest.getVideos(playlistID);
                         foreach(string ID in IDs)
                         {
@@ -268,7 +269,7 @@ namespace TS3MusicBot
                     catch(Exception e)
                     {
                         File.AppendAllText("log.txt", e.Message);
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Bad Request. Tell Jack about this and he'll fix it");
+                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, e.Message);
                     }
                     
                 }
