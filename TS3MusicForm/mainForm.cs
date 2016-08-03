@@ -253,11 +253,11 @@ namespace TS3MusicBot
                     speech = speech.Replace("!say", "");
                     textToSpeech(speech);
                 }
-                else if(getCommand.ToLower().Contains("!playlist"))
+                else if(getCommand.Contains("!playlist"))
                 {
                     try
                     {
-                        string playlistID = getCommand.ToLower().Replace("!playlist", "").Trim();
+                        string playlistID = getCommand.Replace("!playlist", "").Trim();
                         File.AppendAllText("log.txt", playlistID);
                         string[] IDs = playlistRequest.getVideos(playlistID);
                         foreach(string ID in IDs)
