@@ -221,14 +221,15 @@ namespace TS3MusicBot
                 else if (getCommand.ToLower().Contains("!help")) // if the user needs help
                 {
                     var userID = clientID;
-                    QR.PokeClient(userID, "How to use Jack's Music Bot!");
-                    QR.PokeClient(userID, "'!play [song youtube url]' to request a song!");
-                    QR.PokeClient(userID, "'!skip' to skip the current song!");
-                    QR.PokeClient(userID, "'!song' to get the current song that's playing!");
-                    QR.PokeClient(userID, "'!auto' to auto play music (NIGHTCORE!)");
-                    QR.PokeClient(userID, "'!repeat' to toggle repeat for the current song that's playing!");
-                    QR.PokeClient(userID, "!gold to get the current price of 1 WoW token");
-                    QR.PokeClient(userID, "'!say [text here]' to make the bot speak!");
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, userID, "How to use Jack's Music Bot!");
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, userID, "'!play [song youtube url]' to request a song!");
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, userID, "'!skip' to skip the current song!");
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, userID, "'!song' to get the current song that's playing!");
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, userID, "'!auto' to auto play music (NIGHTCORE!)");
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, userID, "'!repeat' to toggle repeat for the current song that's playing!");
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, userID, "!gold to get the current price of 1 WoW token");
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, userID, "'!say [text here]' to make the bot speak!");
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, userID, "'!playlist' [playlist ID] to add a full playlist!");
                 }
                 else if (getCommand.ToLower().Contains("!repeat"))
                 {
