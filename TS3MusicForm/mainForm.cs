@@ -47,6 +47,7 @@ namespace TS3MusicBot
         public AxAXVLC.AxVLCPlugin2 playSongs; // VLC object reference for the one in the form
         public List<YouTubeVideo> songURL; // used to store songs
         public List<string> songLoc; // song names location
+        public List<string> youtubePlaylistVideos;
 
         public bool isStart = true; // boolean used for checking if the programs started
 
@@ -137,11 +138,11 @@ namespace TS3MusicBot
             if (getMusicBotID.ResponseText.Contains("1281")) // if the music bot isnt there
             {
                 string path = "";
-                if(File.Exists(@"C:\Program Files(x86)\TeamSpeak 3 Client\ts3client_win32.exe"))
+                if (File.Exists(@"C:\Program Files(x86)\TeamSpeak 3 Client\ts3client_win32.exe"))
                 {
                     path = @"C:\Program Files(x86)\TeamSpeak 3 Client\ts3client_win32.exe";
                 }
-                else if(File.Exists(@"C:\Program Files\TeamSpeak 3 Client\ts3client_win32.exe"))
+                else if (File.Exists(@"C:\Program Files\TeamSpeak 3 Client\ts3client_win32.exe"))
                 {
                     path = @"C:\Program Files\TeamSpeak 3 Client\ts3client_win32.exe";
                 }
@@ -196,6 +197,7 @@ namespace TS3MusicBot
             playSongs.volume = 60; // sets audio volume to 100
             songURL = new List<YouTubeVideo> { }; // initialises song list
             songLoc = new List<string> { }; // initialises the song names to be stored
+            youtubePlaylistVideos = new List<string> { };
             playSongs.video.fullscreen = false; // sets fullscreen to false
             playSongs.AutoLoop = false; // sets autoloop to false!
         }
@@ -203,7 +205,7 @@ namespace TS3MusicBot
         {
             try
             {
-                if(user.Contains("MusicBot")) // temp!
+                if (user.Contains("MusicBot")) // temp!
                 {
                     return;
                 }
@@ -253,32 +255,37 @@ namespace TS3MusicBot
                 {
                     QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Current price for 1 WoW token: " + getWoWGold());
                 }
-                else if(getCommand.ToLower().Contains("!say"))
+                else if (getCommand.ToLower().Contains("!say"))
                 {
-                    
+
                     string speech = getCommand.ToLower();
                     speech = speech.Replace("!say", "");
                     textToSpeech(speech);
                 }
-                else if(getCommand.Contains("!playlist"))
+                else if (getCommand.Contains("!playlist"))
                 {
                     try
                     {
+                        youtubePlaylistVideos.Clear();
                         string playlistID = getCommand.Replace("!playlist", "").Trim();
                         File.AppendAllText("log.txt", playlistID);
                         string[] IDs = playlistRequest.getVideos(playlistID);
-                        foreach(string ID in IDs)
+                        foreach (string ID in IDs)
                         {
-                            addToQueue(null, "http://youtube.com/watch?v=" + ID);
+                            youtubePlaylistVideos.Add("http://youtube.com/watch?v=" + ID);
+                        }
+                        if (playSongs.playlist.items.count == 0)
+                        {
+                            getNextSong();
                         }
                         QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Playlist added, to remove do !clear");
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         File.AppendAllText("log.txt", e.Message);
                         QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, e.Message);
                     }
-                    
+
                 }
             }
             catch (Exception) { Console.WriteLine("Error with code"); }
@@ -420,6 +427,12 @@ namespace TS3MusicBot
                     restartPlayer(); // reset player 
                     addToQueue(null, currentSongURL); // rerun current song
                 }
+                else if (youtubePlaylistVideos.Count != 0)
+                {
+                    string nextSongFromPlaylist = youtubePlaylistVideos[0];
+                    nextSongFromPlaylist.Remove(0);
+                    addToQueue(null, nextSongFromPlaylist);
+                }
                 else
                 {
                     for (int i = 0; i <= songURL.Count; i++) // gets first video it can find in the playlist
@@ -478,6 +491,7 @@ namespace TS3MusicBot
         {
             songURL.Clear(); //clear song url's
             songLoc.Clear(); // clear song locations
+            youtubePlaylistVideos.Clear();
             QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Song list cleared!"); // tell users the list cleared! :P
         }
 
@@ -518,8 +532,8 @@ namespace TS3MusicBot
                 synth.Speak(say); // say whatever wants to be said.
                 canSpeak = true;
             }
-            
-            
+
+
         }
 
         private void checkForUpdates_Tick(object sender, EventArgs e)
@@ -536,11 +550,11 @@ namespace TS3MusicBot
                 }
                 else
                 {
-                    if(File.ReadAllText("latest.txt") != s)
+                    if (File.ReadAllText("latest.txt") != s)
                     {
                         File.Delete("latest.txt");
                         QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Updating Jack's music bot to new version.");
-                        if(autoplay)
+                        if (autoplay)
                         {
                             stopAuto();
                         }
@@ -549,7 +563,7 @@ namespace TS3MusicBot
                 }
             }
 
-                
+
         }
     }
 }
