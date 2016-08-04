@@ -283,7 +283,7 @@ namespace TS3MusicBot
                     catch (Exception e)
                     {
                         File.AppendAllText("log.txt", e.Message);
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, e.Message);
+                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "I've broken!");
                     }
 
                 }
@@ -431,6 +431,7 @@ namespace TS3MusicBot
                 {
                     string nextSongFromPlaylist = youtubePlaylistVideos[0];
                     nextSongFromPlaylist.Remove(0);
+                    restartPlayer();
                     addToQueue(null, nextSongFromPlaylist);
                 }
                 else
