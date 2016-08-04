@@ -430,7 +430,7 @@ namespace TS3MusicBot
                 else if (youtubePlaylistVideos.Count != 0)
                 {
                     string nextSongFromPlaylist = youtubePlaylistVideos[0];
-                    nextSongFromPlaylist.Remove(0);
+                    youtubePlaylistVideos.RemoveAt(0);
                     restartPlayer();
                     addToQueue(null, nextSongFromPlaylist);
                 }
