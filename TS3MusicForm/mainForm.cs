@@ -234,6 +234,11 @@ namespace TS3MusicBot
                         QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video Blacklisted.");
                     }
                 }
+                else if (getCommand.ToLower().Contains("!anthem")) // sorry in advance.
+                {
+                    addToQueue(null, "!play https://www.youtube.com/watch?v=t3TFfbRJD74");
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "All rise for our national anthem.");
+                }
                 else if (getCommand.ToLower().Contains("!help")) // if the user needs help
                 {
                     var userID = clientID;
