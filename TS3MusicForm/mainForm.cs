@@ -227,6 +227,7 @@ namespace TS3MusicBot
 
                 } // if the users skipping a song
                 else if (getCommand.ToLower().Contains("!song")) { currentSong(); } // if the users asking for the song
+                else if (getCommand.ToLower().Contains("!blacklist")) { blacklist.addToBlacklist(user,getCommand); }
                 else if (getCommand.ToLower().Contains("!help")) // if the user needs help
                 {
                     var userID = clientID;

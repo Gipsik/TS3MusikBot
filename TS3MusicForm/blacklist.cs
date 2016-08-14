@@ -11,13 +11,12 @@ namespace TS3MusicBot
     {
         public static bool checkBlacklist(string songURL)
         {
-            List<string> blacklistedVideos = new List<string> { };
             if(!File.Exists("blacklist.txt"))
             {
                 File.Create("blacklist.txt");
             }
-            blacklistedVideos.AddRange(File.ReadAllLines("blacklist.txt"));
-            if (blacklistedVideos.Contains(songURL.Trim()))
+            string blockedVideos = string.Join(",",File.ReadAllLines("blacklist.txt"));
+            if (blockedVideos.Contains(songURL.Trim()))
             {
                 return true;
             }
@@ -25,6 +24,16 @@ namespace TS3MusicBot
             {
                 return false;
             }
+        }
+
+        internal static void addToBlacklist(string user, string getCommand)
+        {
+            if(user != "someone")
+            {
+                // can possibly do something here for validation.
+            }
+            string URL = getCommand.ToLower().Replace("!blacklist","").Trim();
+            File.AppendText("blacklist.txt").WriteLine(URL);
         }
     }
 }
