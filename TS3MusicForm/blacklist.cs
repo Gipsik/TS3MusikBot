@@ -15,8 +15,8 @@ namespace TS3MusicBot
             {
                 File.Create("blacklist.txt");
             }
-            string blockedVideos = string.Join(",",File.ReadAllLines("blacklist.txt"));
-            if (blockedVideos.Contains(songURL.Trim()))
+            string blockedVideos = string.Join(",", File.ReadAllLines("blacklist.txt")).ToLower();
+            if (blockedVideos.Contains(songURL.Trim().ToLower()))
             {
                 return true;
             }
