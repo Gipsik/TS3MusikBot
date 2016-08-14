@@ -17,7 +17,7 @@ namespace TS3MusicBot
                 File.Create("blacklist.txt");
             }
             blacklistedVideos.AddRange(File.ReadAllLines("blacklist.txt"));
-            if (blacklistedVideos.Contains(songURL))
+            if (blacklistedVideos.Contains(songURL.Trim()))
             {
                 return true;
             }
