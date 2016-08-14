@@ -153,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="autoplay.cs" />
+    <Compile Include="blacklist.cs" />
     <Compile Include="mainForm.cs">
       <SubType>Form</SubType>
     </Compile>

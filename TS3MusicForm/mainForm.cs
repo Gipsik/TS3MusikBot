@@ -320,6 +320,11 @@ namespace TS3MusicBot
                 {
                     vidURL = vidURL.Remove(vidURL.LastIndexOf('#'), vidURL.Length - vidURL.LastIndexOf('#'));
                 }
+                if(blacklist.checkBlacklist(vidURL))
+                {
+                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video is blacklisted."); // tell them songs already there
+                    return;
+                }
                 var youtube = YouTube.Default; // creates youtube object for getting video ect
                 var video = youtube.GetVideo(vidURL); // gets the video info
                 if (songLoc.Contains(vidURL)) // if song is already in the playlist (to prevent spamming :P)
