@@ -26,14 +26,23 @@ namespace TS3MusicBot
             }
         }
 
-        internal static void addToBlacklist(string user, string getCommand)
+        public static bool addToBlacklist(string user, string getCommand)
         {
-            if(user != "someone")
+            try
             {
-                // can possibly do something here for validation.
+                if (user != "someone")
+                {
+                    // can possibly do something here for validation.
+                }
+                string URL = getCommand.ToLower().Replace("!blacklist", "").Trim();
+                File.AppendAllText("blacklist.txt", URL);
+                return true;
             }
-            string URL = getCommand.ToLower().Replace("!blacklist","").Trim();
-            File.AppendText("blacklist.txt").WriteLine(URL);
+            catch(Exception)
+            {
+                return false;
+            }
+            
         }
     }
 }
