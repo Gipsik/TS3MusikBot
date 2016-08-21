@@ -48,11 +48,11 @@ namespace TS3MusicBot
             {
                 string URL = getCommand.ToLower().Replace("!remove", "").Trim();
                 List<string> blacklistedURLs = File.ReadAllLines("blacklist.txt").ToList();
-                foreach(string blacklistedurl in blacklistedURLs)
+                for(int i = blacklistedURLs.Count - 1; i >= 0; i--)
                 {
-                    if(blacklistedurl == URL)
+                    if (blacklistedURLs[i] == URL)
                     {
-                        blacklistedURLs.Remove(blacklistedurl);
+                        blacklistedURLs.Remove(URL);
 
                     }
                 }
