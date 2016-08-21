@@ -49,17 +49,13 @@ namespace TS3MusicBot
                 List<string> blacklistedURLs = File.ReadAllLines("blacklist.txt").ToList();
                 foreach(string blacklistedurl in blacklistedURLs)
                 {
-                    Console.WriteLine(blacklistedurl);
-                    Console.WriteLine(URL);
                     if(blacklistedurl == URL)
                     {
                         blacklistedURLs.Remove(blacklistedurl);
-                        Console.WriteLine("yes");
 
                     }
                 }
-                File.Delete("blacklist.txt");
-                File.WriteAllLines("blacklist.txt", blacklistedURLs);
+                File.WriteAllText("blacklist.txt", string.Join("",blacklistedURLs));
                 return true;
             }
             catch (Exception)
