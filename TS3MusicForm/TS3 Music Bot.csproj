@@ -152,6 +152,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="adminClass.cs" />
     <Compile Include="autoplay.cs" />
     <Compile Include="blacklist.cs" />
     <Compile Include="mainForm.cs">

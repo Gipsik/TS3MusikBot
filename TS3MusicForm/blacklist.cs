@@ -30,10 +30,6 @@ namespace TS3MusicBot
         {
             try
             {
-                if (user != "someone")
-                {
-                    // can possibly do something here for validation.
-                }
                 string URL = getCommand.ToLower().Replace("!blacklist", "").Trim();
                 File.AppendAllText("blacklist.txt", URL);
                 return true;
@@ -43,6 +39,22 @@ namespace TS3MusicBot
                 return false;
             }
             
+        }
+
+        public static bool removeFromBlacklist(string user, string getCommand)
+        {
+            try
+            {
+                string URL = getCommand.ToLower().Replace("!blacklist", "").Trim();
+                string[] blacklistedURLs = File.ReadAllLines("blacklist.txt");
+                blacklistedURLs = blacklistedURLs.Where(url => !url.Contains(URL)).ToArray();
+                File.WriteAllLines("blacklist.txt", blacklistedURLs);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

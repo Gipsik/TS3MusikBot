@@ -229,9 +229,33 @@ namespace TS3MusicBot
                 else if (getCommand.ToLower().Contains("!song")) { currentSong(); } // if the users asking for the song
                 else if (getCommand.ToLower().Contains("!blacklist"))
                 {
-                    if (blacklist.addToBlacklist(user, getCommand))
+                    if(isAdmin(clientID))
                     {
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video Blacklisted.");
+                        if (blacklist.addToBlacklist(user, getCommand))
+                        {
+                            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video Blacklisted.");
+                        }
+                    }
+                    else
+                    {
+                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "You are not authorised to blacklist videos.");
+                        return;
+                    }
+                    
+                }
+                else if (getCommand.ToLower().Contains("!remove"))
+                {
+                    if (isAdmin(clientID))
+                    {
+                        if (blacklist.removeFromBlacklist(user, getCommand))
+                        {
+                            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video Blacklisted.");
+                        }
+                    }
+                    else
+                    {
+                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "You are not authorised to blacklist videos.");
+                        return;
                     }
                 }
                 else if (getCommand.ToLower().Contains("!anthem")) // sorry in advance.
@@ -310,6 +334,19 @@ namespace TS3MusicBot
                 }
             }
             catch (Exception) { Console.WriteLine("Error with code"); }
+        }
+
+        private bool isAdmin(uint clientID)
+        {
+            var client = QR.GetClientInfo(clientID);
+            if(client.ServerGroups.Contains(6)) // 6 is the server admin group.
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
 
