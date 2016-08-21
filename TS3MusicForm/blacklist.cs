@@ -46,8 +46,15 @@ namespace TS3MusicBot
             try
             {
                 string URL = getCommand.ToLower().Replace("!blacklist", "").Trim();
-                string[] blacklistedURLs = File.ReadAllLines("blacklist.txt");
-                blacklistedURLs = blacklistedURLs.Where(url => !url.Contains(URL)).ToArray();
+                List<string> blacklistedURLs = File.ReadAllLines("blacklist.txt").ToList();
+                foreach(string blacklistedurl in blacklistedURLs)
+                {
+                    if(blacklistedurl == URL)
+                    {
+                        blacklistedURLs.Remove(blacklistedurl);
+                    }
+                }
+                File.Delete("blacklist.txt");
                 File.WriteAllLines("blacklist.txt", blacklistedURLs);
                 return true;
             }

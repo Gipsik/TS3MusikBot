@@ -249,7 +249,7 @@ namespace TS3MusicBot
                     {
                         if (blacklist.removeFromBlacklist(user, getCommand))
                         {
-                            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video Blacklisted.");
+                            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video removed from blacklist.");
                         }
                     }
                     else
