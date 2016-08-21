@@ -34,8 +34,9 @@ namespace TS3MusicBot
                 File.AppendAllText("blacklist.txt", URL);
                 return true;
             }
-            catch(Exception)
+            catch(Exception e)
             {
+                Console.WriteLine(e.Message);
                 return false;
             }
             
@@ -58,8 +59,9 @@ namespace TS3MusicBot
                 File.WriteAllText("blacklist.txt", string.Join("",blacklistedURLs));
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 return false;
             }
         }

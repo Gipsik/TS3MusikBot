@@ -254,7 +254,7 @@ namespace TS3MusicBot
                     }
                     else
                     {
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "You are not authorised to blacklist videos.");
+                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "You are not authorised to whitelist videos.");
                         return;
                     }
                 }
