@@ -1,4 +1,4 @@
-#TS3MusikBot
+#TS3MusikBot [![Build Status](https://travis-ci.org/JackRyder/TS3MusikBot.svg?branch=master)](https://travis-ci.org/JackRyder/TS3MusikBot)
 ##Teamspeak3 Music Bot capable of getting requested songs and playing them through a teamspeak music user.
 
 ###Documentation / Setup instructions
