@@ -15,6 +15,7 @@ namespace TS3MusicBot
         {
             if (canSpeak == false)
             {
+                canSpeak = true;
                 return;
             }
             canSpeak = false;

@@ -4,3 +4,9 @@ E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusikUpdater\bin\Debug\TS3MusikUpdater.
 E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusikUpdater\obj\Debug\TS3MusikUpdater.csprojResolveAssemblyReference.cache
 E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusikUpdater\obj\Debug\TS3MusikUpdater.exe
 E:\Dropbox\My C# Projects\TS3MusicBot\TS3MusikUpdater\obj\Debug\TS3MusikUpdater.pdb
+C:\Users\Administrator\Dropbox\My C# Projects\TS3MusicBot\TS3MusikUpdater\bin\Debug\TS3MusikUpdater.exe.config
+C:\Users\Administrator\Dropbox\My C# Projects\TS3MusicBot\TS3MusikUpdater\bin\Debug\TS3MusikUpdater.exe
+C:\Users\Administrator\Dropbox\My C# Projects\TS3MusicBot\TS3MusikUpdater\bin\Debug\TS3MusikUpdater.pdb
+C:\Users\Administrator\Dropbox\My C# Projects\TS3MusicBot\TS3MusikUpdater\obj\Debug\TS3MusikUpdater.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Dropbox\My C# Projects\TS3MusicBot\TS3MusikUpdater\obj\Debug\TS3MusikUpdater.exe
+C:\Users\Administrator\Dropbox\My C# Projects\TS3MusicBot\TS3MusikUpdater\obj\Debug\TS3MusikUpdater.pdb

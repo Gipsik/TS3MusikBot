@@ -21,7 +21,10 @@ namespace TS3MusicBot
             list.Add("'!repeat' to toggle repeat for the current song that's playing!");
             list.Add("!gold to get the current price of 1 WoW token");
             list.Add("'!say [text here]' to make the bot speak!");
-            list.Add("'!playlist' [playlist ID] to add a full playlist!");
+            list.Add("'!playlist [playlist ID]' to add a full playlist!");
+            list.Add("'!bind [key] [value]' to bind a command to another!");
+            list.Add("'!flip' to flip a coin!");
+            list.Add("'!define [term]' to define a word.");
             return list;
         }
     }

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using TS3QueryLib.Core;
 using TS3QueryLib.Core.Server;
-using VideoLibrary;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Speech.Synthesis;
 using YoutubePlaylists;
+using YoutubeExtractor;
+using System.Linq;
 
 namespace TS3MusicBot
 {
@@ -17,7 +17,6 @@ namespace TS3MusicBot
         public mainForm()
         {
             InitializeComponent();
-            getLogin();
         }
 
         public AsyncTcpDispatcher QueryDispatcher; // Query object
@@ -39,15 +38,18 @@ namespace TS3MusicBot
         private speech speaker;
         private playlist playlistRequest;
         private autoDJ autoPlayer;
+        private Random Random;
 
         public string currentSongTitle = "Nothing playing!"; // will be used to store song titles
         public string currentSongURL = "Well, nothings playing.. So.. Nothing?"; // will be used to store song URL's
 
         public AxAXVLC.AxVLCPlugin2 playSongs; // VLC object reference for the one in the form
-        public List<YouTubeVideo> songURL; // used to store songs
+        public List<VideoInfo> songURL; // used to store songs
         public List<string> songLoc; // song names location
         public List<string> youtubePlaylistVideos;
         public showHelp helpMessages;
+
+        public commands userCommands;
 
         public bool isStart = true; // boolean used for checking if the programs started
 
@@ -93,6 +95,12 @@ namespace TS3MusicBot
 
         public void Start()
         {
+            //DoChatBackgroundWorker.RunWorkerAsync();
+            DoBoot();
+        }
+
+        private void DoBoot()
+        {
             QueryDispatcher = new AsyncTcpDispatcher(targetHost, targetPort); // initialises querydispatcher object
             QueryDispatcher.ReadyForSendingCommands += QueryDispatcher_ReadyForSendingCommands; // sets event for sending commands
             QueryDispatcher.ServerClosedConnection += QueryDispatcher_ServerClosedConnection; // sets closed connection event
@@ -105,6 +113,8 @@ namespace TS3MusicBot
             QueryDispatcher = null; // nullify the connection to the querydispatcher, closing all events too
             QR = null; // nullify the queryrunner just to be safe
             Start(); // restart the server
+            string logReportString = "Server connection closed. rebooting it. - " + System.DateTime.Now.ToString("h:mm:ss tt") + ":" + System.DateTime.Now.Date.ToString() + Environment.NewLine;
+            logMessage(logReportString);
         }
 
         private void QueryDispatcher_ReadyForSendingCommands(object sender, EventArgs e)
@@ -142,9 +152,9 @@ namespace TS3MusicBot
                 {
                     path = @"C:\Program Files(x86)\TeamSpeak 3 Client\ts3client_win32.exe";
                 }
-                else if (File.Exists(@"C:\Program Files\TeamSpeak 3 Client\ts3client_win32.exe"))
+                else if (File.Exists(@"C:\Program Files\TeamSpeak 3 Client\ts3client_win64.exe"))
                 {
-                    path = @"C:\Program Files\TeamSpeak 3 Client\ts3client_win32.exe";
+                    path = @"C:\Program Files\TeamSpeak 3 Client\ts3client_win64.exe";
                 }
                 else
                 {
@@ -174,10 +184,15 @@ namespace TS3MusicBot
                 {
                     Console.Clear();
                     Console.WriteLine("Connected using user: " + username);
+                    sqUsername.Text += username;
                     Console.WriteLine("Nickname: " + whoami.ClientNickName);
+                    sqNickname.Text += whoami.ClientNickName;
                     Console.WriteLine("Connected on host: " + targetHost + ":" + targetPort);
+                    serverHost.Text += targetHost + ":" + targetPort;
                     Console.WriteLine("Connected to server: " + QR.GetServerInfo().Name);
+                    serverName.Text += QR.GetServerInfo().Name;
                     Console.WriteLine("Connected Room: " + botLocation);
+                    channelName.Text += botLocation;
                     Console.WriteLine("Successfully registered for notifications!");
                 }
             }
@@ -188,158 +203,202 @@ namespace TS3MusicBot
             string user = e.InvokerNickname; // gets the user who initated the request
             string message = e.Message; // gets the user's request
             uint clientid = e.InvokerClientId; // gets their client ID
-            Console.WriteLine(user, message);
             generateCommands(user, clientid, message); // passes info to method to sort out!
         }
         public void initiatePlayer()
         {
+
             playSongs = axVLCPlugin21; // sets playsongs reference to the VLC object
             playSongs.volume = 60; // sets audio volume to 100
-            songURL = new List<YouTubeVideo> { }; // initialises song list
+            songURL = new List<VideoInfo> { }; // initialises song list
             songLoc = new List<string> { }; // initialises the song names to be stored
             youtubePlaylistVideos = new List<string> { };
             autoPlayer = new autoDJ();
             helpMessages = new showHelp();
             playSongs.video.fullscreen = false; // sets fullscreen to false
             playSongs.AutoLoop = false; // sets autoloop to false!
+            userCommands = new commands();
+            userCommands.updateCommands();
+            playSongs.Visible = false;
+            playSongs.CtlVisible = false;
+            playSongs.SuspendLayout();
         }
         public void generateCommands(string user, uint clientID, string getCommand)
         {
             try
             {
-                if (getCommand.Trim().IndexOf('!') != 0)
+                if (getCommand.Trim().IndexOf('!') == 0)
                 {
-                    return;
-                }
+                    string command = "";
+                    if (getCommand.Trim().Contains(" ")) command = getCommand.Trim().Substring(0, getCommand.Trim().IndexOf(' ')); // if theres a space
+                    else command = getCommand.Trim();
 
-                if (getCommand.Contains("!play") && !getCommand.Contains("!playlist")) { addToQueue(user, getCommand); } // if the users playing a song
-                else if (getCommand.Contains("!skip"))
-                {
-                    if (repeatSong) // if repeat is enabled
+                    switch (command)
                     {
-                        repeat(); // disable repeat!
-                    }
-                    if (autoPlayer.autoplay)
-                    {
-                        autoPlayer.Auto();
-                    }
-                    getNextSong();
+                        case "!play":
+                            addToQueue(user, getCommand);
+                            break;
+                        case "!skip":
+                            skipSong();
+                            break;
+                        case "!song":
+                            currentSong();
+                            break;
+                        case "!blacklist":
+                            if (isAdmin(clientID))
+                            {
+                                if (blacklist.addToBlacklist(user, getCommand))
+                                {
+                                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video Blacklisted.");
+                                }
+                            }
+                            else
+                            {
+                                QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "You are not authorised to blacklist videos.");
+                                return;
+                            }
+                            break;
+                        case "!remove":
+                            if (isAdmin(clientID))
+                            {
+                                if (blacklist.removeFromBlacklist(user, getCommand))
+                                {
+                                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video removed from blacklist.");
+                                }
+                            }
+                            else
+                            {
+                                QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "You are not authorised to whitelist videos.");
+                                return;
+                            }
+                            break;
+                        case "!anthem":
+                            addToQueue(null, "https://www.youtube.com/watch?v=HouWHLN9JYE");
+                            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "All rise for our national anthem.");
+                            break;
+                        case "!help":
+                            var userID = clientID;
+                            foreach (string message in helpMessages.howToUse())
+                            {
+                                QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, userID, message);
+                            }
+                            break;
+                        case "!repeat":
+                            repeat();
+                            break;
+                        case "!clear":
+                            clearLists();
+                            break;
+                        case "!auto":
+                            if (autoPlayer.Auto())
+                            {
+                                QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Nightcore is autoplaying!");
+                            }
+                            else
+                            {
+                                QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Nightcore stopped!");
+                            }
+                            break;
+                        case "!gold":
+                            wowgold goldPrice = new wowgold();
+                            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Current price for 1 WoW token: " + goldPrice.getWoWGold());
+                            break;
+                        case "!say":
+                            if (speaker == null)
+                            {
+                                speaker = new speech();
+                            }
 
-                } // if the users skipping a song
-                else if (getCommand.ToLower().Contains("!song")) { currentSong(); } // if the users asking for the song
-                else if (getCommand.ToLower().Contains("!blacklist"))
-                {
-                    if(isAdmin(clientID))
-                    {
-                        if (blacklist.addToBlacklist(user, getCommand))
-                        {
-                            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video Blacklisted.");
-                        }
+                            string speech = getCommand.ToLower();
+                            speech = speech.Replace("!say", "").Trim();
+                            speaker.textToSpeech(speech);
+                            break;
+                        case "!playlist":
+                            try
+                            {
+                                youtubePlaylistVideos.Clear();
+                                string playlistID = getCommand.Replace("!playlist", "").Trim();
+                                if(playlistID.Trim() == "")
+                                {
+                                    return;
+                                }
+                                string[] IDs = playlistRequest.getVideos(playlistID);
+                                foreach (string ID in IDs)
+                                {
+                                    youtubePlaylistVideos.Add("http://youtube.com/watch?v=" + ID);
+                                }
+                                if (playSongs.playlist.items.count == 0)
+                                {
+                                    getNextSong();
+                                }
+                                QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Playlist added, to remove do !clear");
+                            }
+                            catch (Exception e)
+                            {
+                                logMessage(e.Message);
+                                QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "I've broken!");
+                            }
+                            break;
+                        case "!bind":
+                            string bindedcommand = getCommand.Replace("!bind", "").Trim();
+                            string trigger = bindedcommand.Substring(0, bindedcommand.IndexOf(" "));
+                            string thecommand = bindedcommand.Replace(trigger, "").Trim();
+                            if(userCommands.AddCommand(trigger, thecommand) == false)
+                            {
+                                QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Command could not be binded.");
+                            }
+                            break;
+                        case "!flip":
+                            if(Random == null)
+                            {
+                                Random = new Random();
+                            }
+                            string resp = Random.Next(2) == 1 ? "heads" : "tails";
+                            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "A virtual coin has been flipped, and it landed on: " + resp);
+                            break;
+                        case "!define":
+                            string term = getCommand.Substring(getCommand.IndexOf(' '));
+                            string response = urbandefine.Response(term);
+                            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, response);
+                            break;                            
+                        default:
+                            string mycommand = userCommands.getCommand(command);
+                            if (mycommand.Contains("</3")) QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, mycommand);
+                            else generateCommands("MusicBot", QR.SendWhoAmI().ClientId, mycommand);
+                            break;
                     }
-                    else
-                    {
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "You are not authorised to blacklist videos.");
-                        return;
-                    }
-                    
-                }
-                else if (getCommand.ToLower().Contains("!remove"))
-                {
-                    if (isAdmin(clientID))
-                    {
-                        if (blacklist.removeFromBlacklist(user, getCommand))
-                        {
-                            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video removed from blacklist.");
-                        }
-                    }
-                    else
-                    {
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "You are not authorised to whitelist videos.");
-                        return;
-                    }
-                }
-                else if (getCommand.ToLower().Contains("!anthem")) // sorry in advance.
-                {
-                    addToQueue(null, "!play https://www.youtube.com/watch?v=t3TFfbRJD74");
-                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "All rise for our national anthem.");
-                }
-                else if (getCommand.ToLower().Contains("!help")) // if the user needs help
-                {
-                    var userID = clientID;
-                    foreach (string message in helpMessages.howToUse())
-                    {
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, userID, message);
-                    }
-
-                }
-                else if (getCommand.ToLower().Contains("!repeat"))
-                {
-                    repeat();
-                }
-                else if (getCommand.ToLower().Contains("!clear"))
-                {
-                    clearLists();
-                }
-                else if (getCommand.ToLower().Contains("!auto"))
-                {
-                    if (autoPlayer.Auto())
-                    {
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Nightcore is autoplaying!");
-                    }
-                    else
-                    {
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Nightcore stopped!");
-                    }
-                }
-                else if (getCommand.ToLower().Contains("!gold"))
-                {
-                    wowgold goldPrice = new wowgold();
-                    QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Current price for 1 WoW token: " + goldPrice.getWoWGold());
-                }
-                else if (getCommand.ToLower().Contains("!say"))
-                {
-                    if (speaker == null)
-                    {
-                        speaker = new speech();
-                    }
-
-                    string speech = getCommand.ToLower();
-                    speech = speech.Replace("!say", "").Trim();
-                    speaker.textToSpeech(speech);
-                }
-                else if (getCommand.Contains("!playlist"))
-                {
-                    try
-                    {
-                        youtubePlaylistVideos.Clear();
-                        string playlistID = getCommand.Replace("!playlist", "").Trim();
-                        File.AppendAllText("log.txt", playlistID);
-                        string[] IDs = playlistRequest.getVideos(playlistID);
-                        foreach (string ID in IDs)
-                        {
-                            youtubePlaylistVideos.Add("http://youtube.com/watch?v=" + ID);
-                        }
-                        if (playSongs.playlist.items.count == 0)
-                        {
-                            getNextSong();
-                        }
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Playlist added, to remove do !clear");
-                    }
-                    catch (Exception e)
-                    {
-                        File.AppendAllText("log.txt", e.Message);
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "I've broken!");
-                    }
-
                 }
             }
-            catch (Exception) { Console.WriteLine("Error with code"); }
+            catch (Exception e)
+            {
+                logMessage(e.Message);
+                QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "I've broken!");
+            }
+        }
+
+        private void skipSong()
+        {
+            restartPlayer();
+            if (repeatSong) // if repeat is enabled
+            {
+                repeat(); // disable repeat!
+            }
+            if (autoPlayer.autoplay)
+            {
+                autoPlayer.Auto();
+            }
+            getNextSong();
+        }
+
+        private void logMessage(string message)
+        {
+            File.AppendAllText("log.txt", message);
         }
 
         private bool isAdmin(uint clientID)
         {
             var client = QR.GetClientInfo(clientID);
-            if(client.ServerGroups.Contains(6)) // 6 is the server admin group.
+            if (client.ServerGroups.Contains(6)) // 6 is the server admin group.
             {
                 return true;
             }
@@ -369,13 +428,14 @@ namespace TS3MusicBot
                 {
                     vidURL = vidURL.Remove(vidURL.LastIndexOf('#'), vidURL.Length - vidURL.LastIndexOf('#'));
                 }
-                if(blacklist.checkBlacklist(vidURL))
+                if (blacklist.checkBlacklist(vidURL))
                 {
                     QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Video is blacklisted."); // tell them songs already there
                     return;
                 }
-                var youtube = YouTube.Default; // creates youtube object for getting video ect
-                var video = youtube.GetVideo(vidURL); // gets the video info
+                var videos = DownloadUrlResolver.GetDownloadUrls(vidURL, true);
+                videos = videos.Select(x => x).Where(x => x.VideoType == VideoType.Mp4 && x.AudioType != AudioType.Unknown).ToList();
+                var video = videos.OrderBy(x => x.AudioBitrate).FirstOrDefault();
                 if (songLoc.Contains(vidURL)) // if song is already in the playlist (to prevent spamming :P)
                 {
                     QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Song is already in the queue!"); // tell them songs already there
@@ -396,26 +456,20 @@ namespace TS3MusicBot
                 }
                 retrySong = 0;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                /* if (getCommand.Contains("youtu") && retrySong <= 200)
-                {
-                    addToQueue(user, vidURL); // retry to get the song (current bug with videolib)
-                    retrySong++; // add to counter
-                    return;
-                }
-                retrySong = 0; */
+                Console.WriteLine(e.Message);
                 QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Sorry, " + user + " but your request cannot be fulfilled! :(");
                 string logReportString = user + " - " + getCommand + " - " + System.DateTime.Now.ToString("h:mm:ss tt") + ":" + System.DateTime.Now.Date.ToString() + Environment.NewLine;
-                File.AppendAllText("log.txt", logReportString);
+                logMessage(logReportString);
                 return;
 
             } // if theres an error, tell them it can't be played.
         }
 
-        public void playNow(YouTubeVideo vid)
+        public void playNow(VideoInfo vid)
         {
-            playSongs.playlist.add(vid.Uri); // add song to VLC
+            playSongs.playlist.add(vid.DownloadUrl); // add song to VLC
             playSongs.playlist.next(); // skip to the song added
             playSongs.playlist.play(); // play song!
             if (repeatSong == false)
@@ -431,7 +485,7 @@ namespace TS3MusicBot
                 restartPlayer();  // restarts the player, helps to combat errors that happen (AXVLC is buggy!)
                 var song = songURL[val]; // sets song variable to contain all the information about the song selected
                 currentSongURL = songLoc[val]; // sets the current song URL to the song URL saved
-                playSongs.playlist.add(song.Uri); // adds the song URI to VLC
+                playSongs.playlist.add(song.DownloadUrl); // adds the song URI to VLC
                 playSongs.playlist.next(); // skips to the next song, simples
                 playSongs.playlist.play(); // plays the next song!
                 currentSongTitle = song.Title; // sets the current song title to the current song title
@@ -454,7 +508,14 @@ namespace TS3MusicBot
         {
             playSongs.playlist.stop(); // stops currently playing
             playSongs.playlist.items.clear(); // clears the list incase somethings stayed in there (sneaky ninja videos!)
-            playSongs.Refresh(); // full refresh of the UI and properties
+            if (playSongs.InvokeRequired)
+            {
+                playSongs.Invoke((MethodInvoker)(() => playSongs.Refresh()));
+            }
+            else
+            {
+                playSongs.Refresh(); // full refresh of the UI and properties
+            }
             Console.Clear(); // clears console (trust me this makes it TONS easier to see)
         }
 
@@ -476,14 +537,13 @@ namespace TS3MusicBot
                 }
                 else
                 {
-                    for (int i = 0; i <= songURL.Count; i++) // gets first video it can find in the playlist
+                    songURL.TrimExcess();
+                    if (songURL.Count > 0)
                     {
-                        if (songURL[i] != null) // if it finds a video into which the value isnt nullified / removed
-                        {
-                            playNextSong(i); // selects the video from the playlist using the loops value
-                            break; // breaks the loop, preventing overlapping and skipping videos
-                        }
+                        playNextSong(0);
                     }
+
+
                 }
             }
             catch (System.ArgumentOutOfRangeException) { restartPlayer(); } // if theres no songs left, restart the player
@@ -496,8 +556,9 @@ namespace TS3MusicBot
             var whoami = QR.SendWhoAmI(); // gets the whois for the Serverquery location
             if (newChannel != whoami.ChannelId) // if the server query isn't in the same room as the bot
             {
-                QR.MoveClient(whoami.ClientId, channelID); // switch serverquery room
+                QR.MoveClient(whoami.ClientId, newChannel); // switch serverquery room
                 channelID = newChannel; // set the channel ID to the new channel
+                channelName.Text = "Channel name: " + botLocation;
                 QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Musicbot is now listening to this channel!"); // tell the new channel the music bot is ready!
             }
         }
@@ -505,12 +566,13 @@ namespace TS3MusicBot
         private void encounteredError(object sender, EventArgs e)
         {
             string logReportString = e.ToString() + " - " + System.DateTime.Now.ToString("h:mm:ss tt") + ":" + System.DateTime.Now.Date.ToString() + Environment.NewLine;
-            File.AppendAllText("log.txt", logReportString);
+            logMessage(logReportString);
             getNextSong();
         } // song has ended or VLC as errored, get the next song
 
         private void songFinished(object sender, EventArgs e)
         {
+            restartPlayer();
             getNextSong();
         } // song has ended or VLC as errored, get the next song
 
@@ -541,29 +603,45 @@ namespace TS3MusicBot
             using (WebClient wc = new WebClient())
             {
 
-                string s = wc.DownloadString("https://github.com/JackRyder/TS3MusikBot/commit/master");
-                int indexOf = s.IndexOf("<span class=\"sha user-select-contain\">");
-                s = s.Substring(indexOf, 200);
-                if (!File.Exists(@"latest.txt"))
+                try
                 {
-                    File.WriteAllText("latest.txt", s);
-                }
-                else
-                {
-                    if (File.ReadAllText("latest.txt") != s)
+                    string s = wc.DownloadString("https://github.com/JackRyder/TS3MusikBot/commit/master");
+                    int indexOf = s.IndexOf("<span class=\"sha user-select-contain\">");
+                    s = s.Substring(indexOf, 200);
+                    if (!File.Exists(@"latest.txt"))
                     {
-                        File.Delete("latest.txt");
-                        QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Updating Jack's music bot to new version.");
-                        if (autoPlayer.autoplay)
+                        File.WriteAllText("latest.txt", s);
+                    }
+                    else
+                    {
+                        if (File.ReadAllText("latest.txt") != s)
                         {
-                            autoPlayer.Auto();
+                            File.Delete("latest.txt");
+                            QR.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, channelID, "Updating Jack's music bot to new version.");
+                            if (autoPlayer.autoplay)
+                            {
+                                autoPlayer.Auto();
+                            }
+                            Process.Start("TS3MusikUpdater.exe");
                         }
-                        Process.Start("TS3MusikUpdater.exe");
                     }
                 }
+                catch (Exception ee)
+                {
+                    logMessage(ee.Message);
+                }
+
             }
+        }
+    
+        private void DoChatBackgroundWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            DoBoot();
+        }
 
-
+        private void mainForm_Load(object sender, EventArgs e)
+        {
+            getLogin();
         }
     }
 }
