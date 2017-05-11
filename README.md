@@ -1,11 +1,12 @@
-#TS3MusikBot [![Build Status](https://travis-ci.org/JackRyder/TS3MusikBot.svg?branch=master)](https://travis-ci.org/JackRyder/TS3MusikBot)
-##Teamspeak3 Music Bot capable of getting requested songs and playing them through a teamspeak music user.
+# TS3MusikBot [![Build Status](https://travis-ci.org/JackRyder/TS3MusikBot.svg?branch=master)](https://travis-ci.org/JackRyder/TS3MusikBot)
+
+## Teamspeak3 Music Bot capable of getting requested songs and playing them through a teamspeak music user.
 
 ###Documentation / Setup instructions
 
 Here's a simple way of getting the bot setup. To make it work you want to have a server, or just another machine that you can work with.
 
-####Dependencies:
+#### Dependencies:
 
 * .NET Framework 4.6.1 or above (This requires Windows 7 SP1 or above)
 * A virtual audio device, (I recommend CABLE Virtual Audio).
@@ -23,7 +24,7 @@ Setup instructions:
 
 With any luck, the chat will tell you that the bot has successfully connected and is ready to take requests. Thanks for using my music bot!
 
-####Commands
+#### Commands
 
 > !play [song youtube url]' to request a song!
 
