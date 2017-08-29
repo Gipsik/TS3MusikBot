@@ -2,6 +2,8 @@
 
 ## Teamspeak3 Music Bot capable of getting requested songs and playing them through a teamspeak music user.
 
+## As of last update this project is deprecated from this repo. Feel free to fork and do whatever, but I don't plan on maintaining this anymore. I do have a discord bot built, so if you want to help or use that, [click here](https://github.com/JackRyder/SpagBot/)
+
 ###Documentation / Setup instructions
 
 Here's a simple way of getting the bot setup. To make it work you want to have a server, or just another machine that you can work with.
